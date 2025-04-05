@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamActor - החייאת דמויות</title>
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 30px;
+        }
+        
+        .upload-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #4CAF50;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            color: #ff6b6b;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DreamActor - החייאת דמויות</h1>
+        <div class="upload-form">
+            <form id="uploadForm" action="/generate" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>תמונת דמות:</label>
+                    <input type="file" name="image" accept="image/*" required>
+                    <small>העלה תמונה ברורה של פנים</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>קובץ אודיו:</label>
+                    <input type="file" name="audio" accept="audio/*" required>
+                    <small>העלה קובץ אודיו באיכות טובה</small>
+                </div>
+                
+                <button type="submit">צור אנימציה</button>
+            </form>
+            
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>יוצר אנימציה... אנא המתן</p>
+            </div>
+            
+            <div class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const loading = document.querySelector('.loading');
+            const error = document.querySelector('.error');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            
+            fetch('/generate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'animated_video.mp4';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                loading.style.display = 'none';
+            })
+            .catch(err => {
+                loading.style.display = 'none';
+                error.textContent = err.message || 'אירעה שגיאה בעת יצירת האנימציה';
+                error.style.display = 'block';
+            });
+        };
+    </script>
+</body>
+</html> 

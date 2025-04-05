@@ -1,0 +1,12 @@
+torch
+torchvision
+torchaudio
+numpy
+opencv-python
+imageio
+moviepy
+tqdm
+scipy
+dlib
+face_alignment
+imageio-ffmpeg 
