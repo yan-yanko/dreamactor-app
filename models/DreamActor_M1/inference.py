@@ -3,7 +3,6 @@ import numpy as np
 import cv2
 import face_alignment
 from scipy.spatial.transform import Rotation
-import dlib
 import os
 
 class DreamActorInference:
@@ -13,8 +12,7 @@ class DreamActorInference:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = self._load_model()
         
-        # אתחול מזהה פנים ונקודות ציון
-        self.face_detector = dlib.get_frontal_face_detector()
+        # אתחול מזהה נקודות ציון
         self.fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, device=self.device)
         
     def _load_model(self):
@@ -32,11 +30,6 @@ class DreamActorInference:
     
     def _extract_face_landmarks(self, image):
         """חילוץ נקודות ציון מהפנים"""
-        # זיהוי פנים
-        faces = self.face_detector(image)
-        if len(faces) == 0:
-            raise ValueError("לא זוהו פנים בתמונה")
-            
         # חילוץ נקודות ציון
         landmarks = self.fa.get_landmarks(image)
         if landmarks is None or len(landmarks) == 0:
