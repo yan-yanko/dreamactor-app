@@ -9,6 +9,4 @@ imageio
 moviepy
 tqdm
 scipy
-dlib
-face_alignment
 imageio-ffmpeg 

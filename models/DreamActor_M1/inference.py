@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 import cv2
-import face_alignment
 from scipy.spatial.transform import Rotation
 import os
 
@@ -11,9 +10,6 @@ class DreamActorInference:
         # טעינת המודל המאומן
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = self._load_model()
-        
-        # אתחול מזהה נקודות ציון
-        self.fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, device=self.device)
         
     def _load_model(self):
         """טעינת המודל המאומן"""
@@ -30,12 +26,10 @@ class DreamActorInference:
     
     def _extract_face_landmarks(self, image):
         """חילוץ נקודות ציון מהפנים"""
-        # חילוץ נקודות ציון
-        landmarks = self.fa.get_landmarks(image)
-        if landmarks is None or len(landmarks) == 0:
-            raise ValueError("לא ניתן לחלץ נקודות ציון מהפנים")
-            
-        return landmarks[0]  # מחזיר את נקודות הציון של הפנים הראשונות שזוהו
+        # TODO: להוסיף זיהוי פנים אמיתי
+        # כרגע מחזיר מערך אקראי לדוגמה
+        h, w = image.shape[:2]
+        return np.array([[w/2, h/2]] * 68)  # 68 נקודות ציון מדומות
         
     def _process_audio(self, audio_path):
         """עיבוד האודיו לייצוג שניתן להזין למודל"""
